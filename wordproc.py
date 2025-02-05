@@ -100,10 +100,10 @@ class WordProc():
         status, eventString = self.getContentByIdx(4)
         if not status:
             return False, None
-        match = re.search(r'(\d{4})年(\d{1,2})月(\d{1,2})日，(.*)', eventString)
+        match = re.search(r'([^，。]+)，(.*)', eventString)
         if match:
-            year, month, day, event = match.groups()
-            self.content['发生日期'] = f'{year}-{month}-{day}'
+            dateString, event = match.groups()
+            self.content['发生日期'] = dateString
             self.content['问题描述'] = event
 
         # 责任人 & 责任追究处理
