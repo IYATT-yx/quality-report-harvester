@@ -2,11 +2,12 @@ import os
 
 from commontools import CommonTools as ct
 from dialog import Dialog
+import buildtime
 
 class Constant:
     class Basic:
         projectName = '质量通报提取工具'
-        version = '202501230001'
+        version = buildtime.buildTime
         author = 'IYATT-yx'
         email = 'iyatt@iyatt.com'
         defaultDict = 'dict.txt'
