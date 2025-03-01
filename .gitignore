@@ -3,5 +3,5 @@ dist
 venv
 *.spec
 *.log
-*.txt
+dict.txt
 build
