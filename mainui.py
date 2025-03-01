@@ -1,9 +1,9 @@
 import tkinter
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import os
 
 from commontools import CommonTools
-from constant import Constant
+import constant
 from operatortype import OperatorType
 from wordproc import WordProc
 from dialog import Dialog
@@ -20,7 +20,7 @@ class MainUi(tkinter.Frame):
         self.exts = tuple(ext[1:] for _, ext in self.wordFileTypes if ext != '*.*')
 
     def onOpenFolderButton(self):
-        directory = filedialog.askdirectory(initialdir=CommonTools.getCurrentPath(), title='选择目标文件所在文件夹')
+        directory = filedialog.askdirectory(initialdir=constant.Path.programFileDir, title='选择目标文件所在文件夹')
         if directory:
             directory = os.path.normpath(directory)
             self.folderEntry.delete(0, tkinter.END)
@@ -30,7 +30,7 @@ class MainUi(tkinter.Frame):
             return
 
     def onOpenFileButton(self):
-        files = filedialog.askopenfilenames(initialdir=CommonTools.getCurrentPath(), title='选择目标文件', filetypes=self.wordFileTypes)
+        files = filedialog.askopenfilenames(initialdir=constant.Path.programFileDir, title='选择目标文件', filetypes=self.wordFileTypes)
         if files:
             files = [os.path.normpath(file) for file in files]
             filesString = ''
@@ -43,7 +43,7 @@ class MainUi(tkinter.Frame):
             return
 
     def onOpenDictButton(self):
-        file = filedialog.askopenfilename(initialdir=CommonTools.getCurrentPath(), initialfile='diCommonTools.txt', title='选择自定义字典文件', filetypes=[('文本文件', '*.txt')])
+        file = filedialog.askopenfilename(initialdir=constant.Path.programFileDir, initialfile='diCommonTools.txt', title='选择自定义字典文件', filetypes=[('文本文件', '*.txt')])
         if file:
             file = os.path.normpath(file)
             self.dictEntry.delete(0, tkinter.END)
@@ -128,7 +128,7 @@ class MainUi(tkinter.Frame):
                 return
             
     def onHelpMenuAbout(self):
-        tkinter.messagebox.showinfo('关于', f'{Constant.Basic.projectName}\n版本：{Constant.Basic.version}\n作者：{Constant.Basic.author}\n邮箱：{Constant.Basic.email}')
+        messagebox.showinfo('关于', f'{constant.Basic.projectName}\n版本：{constant.Basic.version}\n作者：{constant.Basic.author}\n邮箱：{constant.Basic.email}')
 
     def getResolution(self):
         """
@@ -151,7 +151,7 @@ class MainUi(tkinter.Frame):
         self.folderEntry = tkinter.Entry(self)
         self.fileEntry = tkinter.Entry(self)
         self.dictEntry = tkinter.Entry(self)
-        self.dictEntry.insert(0, Constant.CustomDict.file)
+        self.dictEntry.insert(0, constant.CustomDict.file)
 
         # 操作按钮
         self.openFolderButton = tkinter.Button(self, text='打开文件夹', command=self.onOpenFolderButton, width=10)

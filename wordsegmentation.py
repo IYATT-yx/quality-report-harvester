@@ -1,7 +1,7 @@
-import jieba
-import jieba.posseg
-
 from dialog import Dialog as dlg
+
+import jieba
+from jieba import posseg
 
 class WordSegmentation:
     customDict = None
@@ -78,7 +78,7 @@ class WordSegmentation:
 
         wordAndTags = []
         for word in wordAndTags:
-            wordAndTag = jieba.posseg.cut(word)
+            wordAndTag = posseg.cut(word)
             for word, tag in wordAndTag:
                 wordAndTags.append((word, tag))
         return wordAndTags
@@ -95,7 +95,7 @@ class WordSegmentation:
             结果
         """
         names = []
-        wordAndTags = jieba.posseg.cut(text)
+        wordAndTags = posseg.cut(text)
         for word, tag in wordAndTags:
             if tag == 'nr':
                 if '奖励' not in text:

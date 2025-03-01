@@ -1,10 +1,11 @@
-import os
-from openpyxl import Workbook
-from openpyxl.styles import Alignment
-
 from operatortype import OperatorType
 from tkinter import filedialog
 from commontools import CommonTools
+import constant
+
+import os
+from openpyxl import Workbook
+from openpyxl.styles import Alignment
 
 class ExcelProc():
     def __init__(self, operatorType: OperatorType, folder: str=None):
@@ -32,7 +33,7 @@ class ExcelProc():
         if self.operatorType == OperatorType.FOLDER:
             initialfile = CommonTools.getNameFromPath(self.folder) + ' ' + CommonTools.getTime() + '.xlsx'
         else:
-            self.folder = CommonTools.getCurrentPath()
+            self.folder = constant.Path.programFileDir
             initialfile = CommonTools.getNameFromPath(self.folder) + ' ' + CommonTools.getTime() + '.xlsx'
 
         self.filePath = filedialog.asksaveasfilename(

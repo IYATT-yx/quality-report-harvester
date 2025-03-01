@@ -5,4 +5,3 @@ venv
 *.log
 *.txt
 build
-buildtime.py

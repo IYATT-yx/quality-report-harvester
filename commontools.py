@@ -18,29 +18,6 @@ class CommonTools:
         return os.path.abspath(path)
     
     @staticmethod
-    def getPackagedStatus():
-        """
-        获取打包状态
-
-        Returns:
-            bool: 是否为打包状态
-        """
-        return getattr(sys, 'frozen', False)
-
-    @staticmethod
-    def getCurrentPath() -> str:
-        """
-        获取程序所在目录
-
-        Returns:
-            str: 程序所在目录
-        """
-        if CommonTools.getPackagedStatus():
-            return os.path.dirname(CommonTools.getAbsPath(sys.executable))
-        else:
-            return os.path.dirname(CommonTools.getAbsPath(__file__))
-        
-    @staticmethod
     def getNameFromPath(path: str) -> str:
         """
         从路径中获取文件名
