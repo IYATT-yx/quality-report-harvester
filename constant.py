@@ -5,24 +5,12 @@ import buildtime
 import os
 import sys
 
-class Status:
-    packaged = not sys.argv[0].endswith('.py')
-    """软件是否处于打包状态"""
-
 class Path:
-    executableCommand = os.path.abspath(sys.argv[0]) if Status.packaged else sys.executable + ' ' + os.path.abspath(sys.argv[0])
-    """软件的执行命令"""
-
-    rootDir = os.path.dirname(
-          sys.executable if Status.packaged else os.path.abspath(sys.argv[0])
-    )
-    """根目录"""
+    rootDir = os.path.dirname(os.path.abspath(__file__))
+    """文件根目录"""
 
     programFileDir = os.path.dirname(os.path.abspath(sys.argv[0]))
     """程序文件所在目录"""
-
-    executableFilePath = os.path.abspath(sys.argv[0]) if Status.packaged else sys.executable
-    """可执行文件路径"""
 
 class Basic:
     projectName = '质量通报提取工具'
@@ -39,4 +27,9 @@ class Dialog:
     encoding = 'utf-8'
 
 class CustomDict:
-    file = os.path.join(Path.programFileDir, 'dict.txt')
+    """自定义词典路径
+    默认在软件同目录下或上级目录下
+    """
+    file1 = os.path.join(Path.programFileDir, 'dict.txt')
+    file2 = os.path.join(os.path.dirname(Path.programFileDir), 'dict.txt')
+    file = file1 if os.path.exists(file1) else file2
