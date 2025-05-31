@@ -12,7 +12,7 @@ def main():
     root.title(constant.Basic.projectName)
 
     # 窗口大小、位置
-    defaultWidth = 800
+    defaultWidth = 1000
     defaultHeight = 150
     defaultX = int((root.winfo_screenwidth() - defaultWidth) / 2)
     defaultY = int((root.winfo_screenheight() - defaultHeight) / 2)
