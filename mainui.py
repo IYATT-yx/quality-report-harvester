@@ -6,7 +6,6 @@ from commontools import CommonTools
 import constant
 from operatortype import OperatorType
 from wordproc import WordProc
-from dialog import Dialog
 from excelproc import ExcelProc
 from wordsegmentation import WordSegmentation
 
@@ -26,7 +25,7 @@ class MainUi(tkinter.Frame):
             self.folderEntry.delete(0, tkinter.END)
             self.folderEntry.insert(0, directory)
         else:
-            Dialog.log('取消选择文件夹')
+            messagebox.showwarning('警告', '未选择文件夹')
             return
 
     def onOpenFileButton(self):
@@ -39,7 +38,7 @@ class MainUi(tkinter.Frame):
             self.fileEntry.delete(0, tkinter.END)
             self.fileEntry.insert(0, filesString)
         else:
-            Dialog.log('取消选择文件')
+            messagebox.showwarning('警告', '未选择文件')
             return
 
     def onOpenDictButton(self):
@@ -49,7 +48,7 @@ class MainUi(tkinter.Frame):
             self.dictEntry.delete(0, tkinter.END)
             self.dictEntry.insert(0, file)
         else:
-            Dialog.log('取消选择词典文件')
+            messagebox.showwarning('警告', '未选择词典文件')
             return
 
     def onExtractButton(self):
@@ -57,10 +56,8 @@ class MainUi(tkinter.Frame):
         excelProc = ExcelProc(operatorType, self.folderEntry.get())
         saveFile = excelProc.openExcel()
         if saveFile is None:
-            Dialog.log('取消保存文件')
+            messagebox.showwarning('警告', '未选择保存文件路径')
             return
-        else:
-            Dialog.log('已选择保存文件路径：' + saveFile)
 
         match self.operatorType.get():
             case OperatorType.FILE:
@@ -70,75 +67,85 @@ class MainUi(tkinter.Frame):
             case OperatorType.FOLDER:
                 folder = self.folderEntry.get()
                 if not CommonTools.checkFolderExist(folder):
-                    Dialog.log('文件夹不存在', Dialog.ERROR)
+                    messagebox.showwarning('警告', '文件夹不存在')
                     return
                 files = CommonTools.getFilesFromFolder(folder, self.exts)
             case OperatorType.ALL:
                 folder = '.'
                 folder = CommonTools.getAbsPath(folder)
                 if not CommonTools.checkFolderExist(folder):
-                    Dialog.log('文件夹不存在', Dialog.ERROR)
+                    messagebox.showwarning('警告', '当前目录不存在')
                     return
                 files = CommonTools.getFilesFromFolder(folder, self.exts)
             case _:
-                Dialog.log('未知操作类型', Dialog.CRITICAL)
+                messagebox.showwarning('警告', '未知操作类型')
                 return
             
         WordSegmentation.loadCustomDict(self.dictEntry.get()) # 加载自定义词典
 
-        Dialog.log('开始处理通报文件：')
         for file in files:
             # 忽略临时文件
             if CommonTools.getNameFromPath(file).startswith('~$'):
                 continue
+            self.modifyExtractButtonText(f'正在处理：{CommonTools.getNameFromPath(file)}')
             status = self.wordProc.openWord(file)
             if not status:
                 continue
             status, content = self.wordProc.do()
             if status:
-                Dialog.log(f'{CommonTools.getNameFromPath(file)}')
                 excelProc.writeContent(content, file)
             else:
                 continue
-        Dialog.log('通报文件处理完成', Dialog.INFO)
+        self.modifyExtractButtonText('提取完成')
+        self.resetExtractButtonText()
         excelProc.closeExcel()
         
     def onOperatorTypeRadio(self):
         match self.operatorType.get():
             case OperatorType.FOLDER:
-                Dialog.log('已选择文件夹模式')
                 self.fileEntry.config(state='readonly')
                 self.openFileButton.config(state='disabled')
                 self.folderEntry.config(state='normal')
                 self.openFolderButton.config(state='normal')
             case OperatorType.FILE:
-                Dialog.log('已选择文件模式')
                 self.folderEntry.config(state='readonly')
                 self.openFolderButton.config(state='disabled')
                 self.fileEntry.config(state='normal')
                 self.openFileButton.config(state='normal')
             case OperatorType.ALL:
-                Dialog.log('已选择全部模式')
                 self.folderEntry.config(state='readonly')
                 self.fileEntry.config(state='readonly')
                 self.openFolderButton.config(state='disabled')
                 self.openFileButton.config(state='disabled')
             case _:
-                Dialog.log('未知操作模式', Dialog.CRITICAL)
+                messagebox.showwarning('警告', '未知操作类型')
                 return
             
     def onHelpMenuAbout(self):
         messagebox.showinfo('关于', f'{constant.Basic.projectName}\n版本：{constant.Basic.version}\n作者：{constant.Basic.author}\n邮箱：{constant.Basic.email}')
 
-    def getResolution(self):
-        """
-        获取分辨率
-        """
-        Dialog.log(f'屏幕分辨率：{self.winfo_screenwidth()}×{self.winfo_screenheight()}，窗口大小：{self.master.winfo_width()}×{self.master.winfo_height()}')
-
     def onClosing(self):
-        Dialog.log('程序退出')
         self.master.destroy()
+
+    def modifyExtractButtonText(self, text: str):
+        """
+        修改提取按钮文本
+
+        Args:
+            text (str): 新的文本
+            wrap (bool): 是否自动换行，默认True
+        """
+        self.extractButton.config(text=text)
+        self.extractButton.update_idletasks()
+
+    def resetExtractButtonText(self, time=3000):
+        """
+        重置提取按钮文本
+
+        Args:
+            time (int): 重置时间，单位为毫秒，默认3000毫秒
+        """
+        self.after(time, self.modifyExtractButtonText, '开始提取')
 
     def mainWindow(self):
         # 文字标签
@@ -156,7 +163,7 @@ class MainUi(tkinter.Frame):
         # 操作按钮
         self.openFolderButton = tkinter.Button(self, text='打开文件夹', command=self.onOpenFolderButton, width=10)
         self.openFileButton = tkinter.Button(self, text='打开文件', command=self.onOpenFileButton, width=10)
-        self.extractButton = tkinter.Button(self, text='提取', width=4, command=self.onExtractButton)
+        self.extractButton = tkinter.Button(self, text='开始提取', bd=5, width=50, command=self.onExtractButton)
         self.openDictButton = tkinter.Button(self, text='打开词典', command=self.onOpenDictButton, width=10)
 
         # 模式单选
@@ -193,5 +200,3 @@ class MainUi(tkinter.Frame):
         self.wordProc = WordProc()
 
         self.master.protocol("WM_DELETE_WINDOW", self.onClosing)
-
-        self.after(1000, self.getResolution)
